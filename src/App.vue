@@ -71,8 +71,8 @@ let defaultLayout = [
         i: "radialChart",
         maxH: 2
     },
-    { x: 1, y: 0, w: 1, h: 1, i: "B", maxH: 2 },
-    { x: 2, y: 0, w: 2, h: 1, i: "deadpool", maxH: 2 }
+    { x: 1, y: 0, w: 1, h: 1, i: "xychart", maxH: 2 },
+    { x: 2, y: 0, w: 2, h: 1, i: "divergentchart", maxH: 2 }
 ];
 
 export default {
@@ -94,96 +94,9 @@ export default {
         }
     },
     mounted() {
-        let chartObj = document.getElementById("radialChart");
-        let chart = am4core.create(chartObj, am4charts.RadarChart);
-
-        // Add data
-        chart.data = [
-            {
-                category: "Students",
-                value: 80,
-                full: 100
-            },
-            {
-                category: "Gen Y / Millenials",
-                value: 35,
-                full: 100
-            },
-            {
-                category: "Brand Advocates",
-                value: 92,
-                full: 100
-            },
-            {
-                category: "Parents",
-                value: 68,
-                full: 100
-            }
-        ];
-
-        // Make chart not full circle
-        chart.startAngle = -90;
-        chart.endAngle = 180;
-        chart.innerRadius = am4core.percent(20);
-
-        // Set number format
-        chart.numberFormatter.numberFormat = "#.#'%'";
-
-        // Create axes
-        var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
-        categoryAxis.dataFields.category = "category";
-        categoryAxis.renderer.grid.template.location = 0;
-        categoryAxis.renderer.grid.template.strokeOpacity = 0;
-        categoryAxis.renderer.labels.template.horizontalCenter = "right";
-        categoryAxis.renderer.labels.template.fontWeight = 500;
-        categoryAxis.renderer.labels.template.adapter.add("fill", function(
-            fill,
-            target
-        ) {
-            return target.dataItem.index >= 0
-                ? chart.colors.getIndex(target.dataItem.index)
-                : fill;
-        });
-        categoryAxis.renderer.minGridDistance = 20;
-
-        var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
-        valueAxis.renderer.labels.template.fontWeight = 500;
-        valueAxis.renderer.labels.template.fontSize = "13px";
-        valueAxis.renderer.labels.template.fill = "#566d82";
-        valueAxis.renderer.grid.template.strokeOpacity = 0;
-        valueAxis.min = 0;
-        valueAxis.max = 100;
-        valueAxis.strictMinMax = true;
-
-        // Create series - the backdrop
-        var series1 = chart.series.push(new am4charts.RadarColumnSeries());
-        series1.dataFields.valueX = "full";
-        series1.dataFields.categoryY = "category";
-        series1.clustered = false;
-        series1.columns.template.fill = new am4core.InterfaceColorSet().getFor(
-            "alternativeBackground"
-        );
-        series1.columns.template.fillOpacity = 0.08;
-        series1.columns.template.cornerRadiusTopLeft = 20;
-        series1.columns.template.strokeWidth = 0;
-        series1.columns.template.radarColumn.cornerRadius = 20;
-
-        var series2 = chart.series.push(new am4charts.RadarColumnSeries());
-        series2.dataFields.valueX = "value";
-        series2.dataFields.categoryY = "category";
-        series2.clustered = false;
-        series2.columns.template.strokeWidth = 0;
-        series2.columns.template.tooltipText = "{category}: [bold]{value}[/]";
-        series2.columns.template.radarColumn.cornerRadius = 20;
-        series2.sequencedInterpolation = true;
-
-        series2.columns.template.adapter.add("fill", function(fill, target) {
-            return chart.colors.getIndex(target.dataItem.index);
-        });
-
-        // Add cursor
-        // chart.cursor = new am4charts.RadarCursor();
+        createRadarChart();
         createDivergentStackedChart();
+        createXYChart();
     },
     beforeDestroy() {
         if (this.chart) {
@@ -192,9 +105,97 @@ export default {
     }
 };
 
+function createRadarChart() {
+    let chart = am4core.create("radialChart", am4charts.RadarChart);
+
+    // Add data
+    chart.data = [
+        {
+            category: "Students",
+            value: 80,
+            full: 100
+        },
+        {
+            category: "Gen Y / Millenials",
+            value: 35,
+            full: 100
+        },
+        {
+            category: "Brand Advocates",
+            value: 92,
+            full: 100
+        },
+        {
+            category: "Parents",
+            value: 68,
+            full: 100
+        }
+    ];
+
+    // Make chart not full circle
+    chart.startAngle = -90;
+    chart.endAngle = 180;
+    chart.innerRadius = am4core.percent(20);
+
+    // Set number format
+    chart.numberFormatter.numberFormat = "#.#'%'";
+
+    // Create axes
+    var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "category";
+    categoryAxis.renderer.grid.template.location = 0;
+    categoryAxis.renderer.grid.template.strokeOpacity = 0;
+    categoryAxis.renderer.labels.template.horizontalCenter = "right";
+    categoryAxis.renderer.labels.template.fontWeight = 500;
+    categoryAxis.renderer.labels.template.adapter.add("fill", function(
+        fill,
+        target
+    ) {
+        return target.dataItem.index >= 0
+            ? chart.colors.getIndex(target.dataItem.index)
+            : fill;
+    });
+    categoryAxis.renderer.minGridDistance = 20;
+
+    var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+    valueAxis.renderer.labels.template.fontWeight = 500;
+    valueAxis.renderer.labels.template.fontSize = "13px";
+    valueAxis.renderer.labels.template.fill = "#566d82";
+    valueAxis.renderer.grid.template.strokeOpacity = 0;
+    valueAxis.min = 0;
+    valueAxis.max = 100;
+    valueAxis.strictMinMax = true;
+
+    // Create series - the backdrop
+    var series1 = chart.series.push(new am4charts.RadarColumnSeries());
+    series1.dataFields.valueX = "full";
+    series1.dataFields.categoryY = "category";
+    series1.clustered = false;
+    series1.columns.template.fill = new am4core.InterfaceColorSet().getFor(
+        "alternativeBackground"
+    );
+    series1.columns.template.fillOpacity = 0.08;
+    series1.columns.template.cornerRadiusTopLeft = 20;
+    series1.columns.template.strokeWidth = 0;
+    series1.columns.template.radarColumn.cornerRadius = 20;
+
+    var series2 = chart.series.push(new am4charts.RadarColumnSeries());
+    series2.dataFields.valueX = "value";
+    series2.dataFields.categoryY = "category";
+    series2.clustered = false;
+    series2.columns.template.strokeWidth = 0;
+    series2.columns.template.tooltipText = "{category}: [bold]{value}[/]";
+    series2.columns.template.radarColumn.cornerRadius = 20;
+    series2.sequencedInterpolation = true;
+
+    series2.columns.template.adapter.add("fill", function(fill, target) {
+        return chart.colors.getIndex(target.dataItem.index);
+    });
+}
+
 function createDivergentStackedChart() {
     // Create chart instance
-    var chart = am4core.create("deadpool", am4charts.XYChart);
+    var chart = am4core.create("divergentchart", am4charts.XYChart);
 
     // Title
     var title = chart.titles.push(new am4core.Label());
@@ -312,6 +313,70 @@ function createDivergentStackedChart() {
             }
         });
     });
+}
+
+function createXYChart() {
+    // Create chart instance
+    var chart = am4core.create("xychart", am4charts.XYChart);
+
+    // Add data
+    chart.data = [
+        {
+            date: "2012-03-01",
+            price: 20
+        },
+        {
+            date: "2012-03-02",
+            price: 75
+        },
+        {
+            date: "2012-03-03",
+            price: 15
+        },
+        {
+            date: "2012-03-04",
+            price: 75
+        },
+        {
+            date: "2012-03-05",
+            price: 158
+        },
+        {
+            date: "2012-03-06",
+            price: 57
+        }
+    ];
+
+    // Create axes
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.grid.template.location = 0;
+    dateAxis.renderer.minGridDistance = 50;
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.renderer.minGridDistance = 50;
+
+    // Create series
+    var series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.valueY = "price";
+    series.dataFields.dateX = "date";
+    series.tensionX = 0.8;
+    series.strokeWidth = 3;
+    series.tooltipText = "{value}";
+
+    var bullet = series.bullets.push(new am4charts.CircleBullet());
+    bullet.circle.fill = am4core.color("#fff");
+    bullet.circle.strokeWidth = 3;
+
+    // Add cursor
+    // chart.cursor = new am4charts.XYCursor();
+    // chart.cursor.fullWidthLineX = true;
+    // chart.cursor.xAxis = dateAxis;
+    // chart.cursor.lineX.strokeWidth = 0;
+    // chart.cursor.lineX.fill = am4core.color("#000");
+    // chart.cursor.lineX.fillOpacity = 0.1;
+
+    // Add scrollbar
+    // chart.scrollbarX = new am4core.Scrollbar();
 }
 </script>
 
