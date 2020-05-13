@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+        <button type="button" @click="addGridItem">Add Grid Item</button>
         <grid-layout
             :layout.sync="layout"
             :col-num="4"
@@ -83,13 +84,24 @@ export default {
     },
     data: function() {
         return {
-            layout: defaultLayout
+            layout: defaultLayout,
+            customItemCount: 0
         };
     },
     methods: {
         removeGridItem(id) {
             this.layout = this.layout.filter(function(el) {
                 return el.i != id;
+            });
+        },
+        addGridItem() {
+            this.customItemCount += 1;
+            this.layout.push({
+                x: 0,
+                y: 0,
+                w: 1,
+                h: 1,
+                i: `customItem${this.customItemCount}`
             });
         }
     },
@@ -351,6 +363,7 @@ function createXYChart() {
     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
     dateAxis.renderer.minGridDistance = 50;
+    dateAxis.renderer.labels.template.labelRotation = 45;
 
     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.renderer.minGridDistance = 50;
